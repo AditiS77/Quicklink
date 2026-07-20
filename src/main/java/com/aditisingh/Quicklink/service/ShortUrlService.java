@@ -2,6 +2,7 @@ package com.aditisingh.Quicklink.service;
 
 import com.aditisingh.Quicklink.entity.ShortUrl;
 import com.aditisingh.Quicklink.entity.Visibility;
+import com.aditisingh.Quicklink.exception.ExpiredShortUrlException;
 import com.aditisingh.Quicklink.exception.PrivateUrlAccessDeniedException;
 import com.aditisingh.Quicklink.repository.ShortUrlRepository;
 import com.aditisingh.Quicklink.repository.UserRepository;
@@ -32,14 +33,16 @@ public class ShortUrlService {
     }
 
     @Transactional
-    public ShortUrl createShortUrl(String originalUrl, LocalDateTime expiresAt, Visibility visibility, String ownerEmail) {
+    public ShortUrl createShortUrl(String originalUrl, LocalDateTime expiresAt, Visibility visibility,
+            String ownerEmail) {
         var owner = userRepository.findByEmail(ownerEmail)
                 .orElseThrow(() -> new IllegalStateException("Authenticated user no longer exists"));
         Instant expirationInstant = expiresAt == null ? null : expiresAt.toInstant(ZoneOffset.UTC);
         for (int attempt = 0; attempt < MAX_GENERATION_ATTEMPTS; attempt++) {
             String shortCode = generateShortCode();
             if (!shortUrlRepository.existsByShortCode(shortCode)) {
-                return shortUrlRepository.save(new ShortUrl(originalUrl, shortCode, expirationInstant, owner, visibility));
+                return shortUrlRepository
+                        .save(new ShortUrl(originalUrl, shortCode, expirationInstant, owner, visibility));
             }
         }
 
@@ -49,6 +52,11 @@ public class ShortUrlService {
     @Transactional(readOnly = true)
     public List<ShortUrl> findUrlsForOwner(String ownerEmail) {
         return shortUrlRepository.findAllByOwner_EmailOrderByCreatedAtDesc(ownerEmail);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ShortUrl> findAllUrls() {
+        return shortUrlRepository.findAllWithOwnerOrderByCreatedAtDesc();
     }
 
     @Transactional
@@ -63,7 +71,7 @@ public class ShortUrlService {
             throw new PrivateUrlAccessDeniedException();
         }
         if (resolvedUrl.isExpired()) {
-            return Optional.empty();
+            throw new ExpiredShortUrlException();
         }
 
         return incrementClickCount(resolvedUrl);

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Admin Dashboard | QuickLink')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar(true, true)}"></nav>
+<main class="container py-5 site-main">
+    <div class="mb-4"><p class="text-primary fw-semibold mb-1">Administration</p><h1 class="h2 mb-0">Admin Dashboard</h1></div>
+    <section class="card surface-card shadow-sm mb-4">
+        <div class="card-body p-4"><h2 class="h4 mb-4">Users</h2><div class="table-responsive"><table class="table table-hover align-middle mb-0"><thead class="table-light"><tr><th>Name</th><th>Email</th><th>Role</th></tr></thead><tbody><tr th:each="user : ${users}"><td th:text="${user.name}"></td><td th:text="${user.email}"></td><td><span class="badge text-bg-secondary" th:text="${user.role}"></span></td></tr></tbody></table></div></div>
+    </section>
+    <section class="card surface-card shadow-sm">
+        <div class="card-body p-4"><h2 class="h4 mb-4">Short URLs</h2><div class="table-responsive"><table class="table table-hover align-middle mb-0"><thead class="table-light"><tr><th>Short code</th><th>Owner</th><th>Visibility</th><th>Clicks</th><th>Expires</th><th>Created</th></tr></thead><tbody><tr th:each="shortUrl : ${shortUrls}"><td th:text="${shortUrl.shortCode}"></td><td th:text="${shortUrl.owner.email}"></td><td><span class="badge text-bg-primary" th:text="${shortUrl.visibility}"></span></td><td th:text="${shortUrl.clickCount}"></td><td th:text="${shortUrl.expiresAt == null ? 'Never' : shortUrl.expiresAt}"></td><td th:text="${shortUrl.createdAt}"></td></tr></tbody></table></div></div>
+    </section>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

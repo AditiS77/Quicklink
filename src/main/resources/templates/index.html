@@ -1,90 +1,107 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QuickLink</title>
+<head th:replace="~{fragments/layout :: head('QuickLink')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar(${currentUserName != null}, ${isAdmin == true})}"></nav>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="bg-light">
+<main class="container py-5 site-main">
+    <section class="hero p-5 p-lg-6 text-center" th:if="${currentUserName == null}">
+        <p class="text-primary fw-semibold mb-2">Simple, secure link management</p>
+        <h1 class="display-4 fw-bold mb-3">QuickLink 🚀</h1>
+        <p class="lead mx-auto mb-3" style="max-width: 44rem;">Create secure, shareable and trackable short URLs.</p>
+        <p class="text-secondary mx-auto mb-4" style="max-width: 42rem;">QuickLink helps you turn long destinations into memorable links while keeping ownership, visibility, expiration, and clicks in one place.</p>
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+            <a class="btn btn-outline-primary btn-lg px-4" th:href="@{/login}">Login</a>
+            <a class="btn btn-primary btn-lg px-4" th:href="@{/register}">Create Account</a>
+        </div>
+    </section>
 
-<div class="container">
+    <section class="row g-4 mt-1" th:if="${currentUserName == null}">
+        <div class="col-md-6 col-lg-4">
+            <article class="card feature-card shadow-sm h-100 p-2"><div class="card-body"><div class="feature-icon mb-3">🔗</div><h2 class="h5">URL Shortening</h2><p class="text-secondary mb-0">Generate short, shareable links instantly.</p></div></article>
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <article class="card feature-card shadow-sm h-100 p-2"><div class="card-body"><div class="feature-icon mb-3">📈</div><h2 class="h5">Click Analytics</h2><p class="text-secondary mb-0">Track how many times every link has been visited.</p></div></article>
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <article class="card feature-card shadow-sm h-100 p-2"><div class="card-body"><div class="feature-icon mb-3">⏱️</div><h2 class="h5">Expiration Support</h2><p class="text-secondary mb-0">Create links that automatically expire when you choose.</p></div></article>
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <article class="card feature-card shadow-sm h-100 p-2"><div class="card-body"><div class="feature-icon mb-3">🔒</div><h2 class="h5">Public &amp; Private URLs</h2><p class="text-secondary mb-0">Choose whether your links are accessible by everyone or only by you.</p></div></article>
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <article class="card feature-card shadow-sm h-100 p-2"><div class="card-body"><div class="feature-icon mb-3">🛡️</div><h2 class="h5">Secure Authentication</h2><p class="text-secondary mb-0">Manage your links through protected user accounts.</p></div></article>
+        </div>
+    </section>
 
-    <div class="row justify-content-center mt-5">
-
-        <div class="col-md-8 col-lg-6">
-
-            <div class="text-center mb-4">
-                <h1 class="display-5 fw-bold">QuickLink 🚀</h1>
-                <p class="text-muted">
-                    Shorten long URLs into clean, shareable links
-                </p>
-                <p>
-                    <a th:href="@{/login}">Log in</a>
-                    <span>or</span>
-                    <a th:href="@{/register}">create an account</a>
-                </p>
-            </div>
-
-            <div class="card shadow-sm">
-
-                <div class="card-body p-4">
-
-                    <h4 class="mb-3">Create Short URL</h4>
-
-                    <form th:action="@{/shorten}" method="post">
-
-                        <div class="mb-3">
-                            <label for="originalUrl" class="form-label">
-                                Original URL
-                            </label>
-                    
-                            <input
-                                    type="url"
-                                    class="form-control"
-                                    id="originalUrl"
-                                    name="originalUrl"
-                                    placeholder="https://example.com/very/long/url">
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="expiresAt" class="form-label">
-                                Expiration date and time (optional, UTC)
-                            </label>
-
-                            <input
-                                    type="datetime-local"
-                                    class="form-control"
-                                    id="expiresAt"
-                                    name="expiresAt">
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="visibility" class="form-label">Visibility</label>
-                            <select class="form-select" id="visibility" name="visibility">
-                                <option value="PUBLIC">Public</option>
-                                <option value="PRIVATE">Private</option>
-                            </select>
-                        </div>
-                    
-                        <button
-                                type="submit"
-                                class="btn btn-primary w-100">
-                            Shorten URL
-                        </button>
-                    
-                    </form>
-                </div>
-
-            </div>
-
+    <section class="mx-auto" style="max-width: 46rem;" th:if="${currentUserName != null}">
+        <div class="mb-4">
+            <p class="text-primary fw-semibold mb-1">Your workspace</p>
+            <h1 class="h2 mb-0">Welcome, <span th:text="${currentUserName}">User</span></h1>
         </div>
 
-    </div>
+        <div class="card surface-card shadow-sm">
+            <div class="card-body p-4 p-md-5">
+                <h2 class="h4 mb-1">Create a short URL</h2>
+                <p class="text-secondary mb-4">Turn a long destination into a link you control.</p>
+                <form th:action="@{/shorten}" th:object="${createShortUrlRequest}" method="post" novalidate>
+                    <div class="mb-3">
+                        <label for="originalUrl" class="form-label fw-medium">Original URL</label>
+                        <input type="url" class="form-control form-control-lg" th:classappend="${#fields.hasErrors('originalUrl')} ? ' is-invalid'" th:field="*{originalUrl}" placeholder="https://example.com/very/long/url" required>
+                        <div class="invalid-feedback" th:errors="*{originalUrl}"></div>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-7">
+                            <label for="expiresAt" class="form-label fw-medium">Expiration date <span class="text-secondary fw-normal">(optional, UTC)</span></label>
+                            <input type="datetime-local" class="form-control" th:classappend="${#fields.hasErrors('expiresAt')} ? ' is-invalid'" th:field="*{expiresAt}">
+                            <div class="invalid-feedback" th:errors="*{expiresAt}"></div>
+                        </div>
+                        <div class="col-md-5">
+                            <label for="visibility" class="form-label fw-medium">Visibility</label>
+                            <select class="form-select" th:field="*{visibility}"><option value="PUBLIC">Public</option><option value="PRIVATE">Private</option></select>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary btn-lg w-100 mt-4" type="submit">Shorten URL</button>
+                </form>
+                <div class="alert alert-danger mt-4 mb-0" role="alert" th:if="${creationError}" th:text="${creationError}"></div>
+            </div>
+        </div>
 
-</div>
+        <section class="card surface-card shadow-sm mt-4" th:if="${generatedShortUrl}">
+            <div class="card-body p-4">
+                <div class="alert alert-success d-flex align-items-center mb-4" role="alert"><span class="me-2">✅</span><span th:text="${successMessage}">Short URL created successfully.</span></div>
+                <h2 class="h5 mb-3">Most recently generated URL</h2>
+                <dl class="row mb-0">
+                    <dt class="col-sm-3 text-secondary fw-medium">Original URL</dt><dd class="col-sm-9 text-break" th:text="${createShortUrlRequest.originalUrl}"></dd>
+                    <dt class="col-sm-3 text-secondary fw-medium">Short URL</dt><dd class="col-sm-9"><a th:href="${generatedShortUrl}" th:text="${generatedShortUrl}" target="_blank" rel="noopener"></a></dd>
+                    <dt class="col-sm-3 text-secondary fw-medium">Visibility</dt><dd class="col-sm-9" th:text="${createShortUrlRequest.visibility}"></dd>
+                    <dt class="col-sm-3 text-secondary fw-medium">Expiration</dt><dd class="col-sm-9" th:text="${createShortUrlRequest.expiresAt == null ? 'Never' : createShortUrlRequest.expiresAt}"></dd>
+                    <dt class="col-sm-3 text-secondary fw-medium">Current clicks</dt><dd class="col-sm-9">0</dd>
+                </dl>
+                <button class="btn btn-outline-primary" id="copyShortUrl" type="button" th:data-short-url="${generatedShortUrl}">Copy Link</button>
+            </div>
+        </section>
+    </section>
+</main>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+<script>
+    const copyButton = document.getElementById('copyShortUrl');
+    if (copyButton) {
+        copyButton.addEventListener('click', async () => {
+            const originalLabel = copyButton.textContent;
+            try {
+                await navigator.clipboard.writeText(copyButton.dataset.shortUrl);
+                copyButton.textContent = '✔ Copied!';
+                setTimeout(() => copyButton.textContent = originalLabel, 2000);
+            } catch (error) {
+                copyButton.textContent = 'Unable to copy';
+                setTimeout(() => copyButton.textContent = originalLabel, 2000);
+            }
+        });
+    }
+</script>
 </body>
 </html>

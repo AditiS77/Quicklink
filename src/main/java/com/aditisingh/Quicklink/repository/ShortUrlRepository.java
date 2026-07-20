@@ -6,8 +6,8 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.Optional;
 import java.util.List;
+import java.util.Optional;
 
 public interface ShortUrlRepository extends JpaRepository<ShortUrl, Long> {
 
@@ -16,6 +16,9 @@ public interface ShortUrlRepository extends JpaRepository<ShortUrl, Long> {
     Optional<ShortUrl> findByShortCode(String shortCode);
 
     List<ShortUrl> findAllByOwner_EmailOrderByCreatedAtDesc(String email);
+
+    @Query("select shortUrl from ShortUrl shortUrl join fetch shortUrl.owner order by shortUrl.createdAt desc")
+    List<ShortUrl> findAllWithOwnerOrderByCreatedAtDesc();
 
     @Modifying
     @Query("update ShortUrl shortUrl set shortUrl.clickCount = shortUrl.clickCount + 1 where shortUrl.id = :id")

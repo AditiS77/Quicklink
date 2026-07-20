@@ -8,8 +8,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Locale;
 
 @Service
@@ -31,7 +33,23 @@ public class UserService implements UserDetailsService {
         }
 
         User user = new User(name.trim(), normalizedEmail, passwordEncoder.encode(password), Role.USER);
-        userRepository.save(user);
+        try {
+            userRepository.saveAndFlush(user);
+        } catch (DataIntegrityViolationException exception) {
+            throw new IllegalArgumentException("An account already exists for this email address", exception);
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public List<User> findAllUsers() {
+        return userRepository.findAllByOrderByIdAsc();
+    }
+
+    @Transactional(readOnly = true)
+    public String findNameByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .map(User::getName)
+                .orElse(email);
     }
 
     @Override

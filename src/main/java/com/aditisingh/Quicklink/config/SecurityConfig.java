@@ -17,8 +17,9 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/", "/login", "/register", "/*").permitAll()
+                        .requestMatchers("/admin", "/admin/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/", "/login", "/register").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/{shortCode:[A-Za-z0-9]{8}}").permitAll()
                         .requestMatchers("/login", "/register").permitAll()
                         .requestMatchers("/shorten", "/my-urls", "/manage/**").authenticated()
                         .anyRequest().authenticated())
