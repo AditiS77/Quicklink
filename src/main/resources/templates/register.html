@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register | QuickLink</title>
+</head>
+<body>
+<main>
+    <h1>Create an Account</h1>
+    <form th:action="@{/register}" th:object="${registrationRequest}" method="post">
+        <label for="name">Name</label>
+        <input id="name" th:field="*{name}" required>
+        <p th:errors="*{name}"></p>
+
+        <label for="email">Email</label>
+        <input id="email" th:field="*{email}" type="email" required>
+        <p th:errors="*{email}"></p>
+
+        <label for="password">Password</label>
+        <input id="password" th:field="*{password}" type="password" minlength="8" required>
+        <p th:errors="*{password}"></p>
+
+        <button type="submit">Register</button>
+    </form>
+    <p><a th:href="@{/login}">Already have an account? Log in</a></p>
+</main>
+</body>
+</html>

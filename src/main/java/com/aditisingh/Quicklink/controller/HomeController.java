@@ -3,6 +3,8 @@ package com.aditisingh.Quicklink.controller;
 import com.aditisingh.Quicklink.dto.CreateShortUrlRequest;
 import com.aditisingh.Quicklink.service.ShortUrlService;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,14 +27,17 @@ public class HomeController {
     }
 
     @PostMapping("/shorten")
-    public String shortenUrl(CreateShortUrlRequest request) {
-        shortUrlService.createShortUrl(request.getOriginalUrl());
+    public String shortenUrl(CreateShortUrlRequest request, @AuthenticationPrincipal UserDetails user) {
+        shortUrlService.createShortUrl(
+                request.getOriginalUrl(), request.getExpiresAt(), request.getVisibility(), user.getUsername());
         return "index";
     }
 
     @GetMapping("/{shortCode}")
-    public ModelAndView redirectToOriginalUrl(@PathVariable String shortCode) {
-        return shortUrlService.findOriginalUrl(shortCode)
+    public ModelAndView redirectToOriginalUrl(@PathVariable String shortCode,
+            @AuthenticationPrincipal UserDetails user) {
+        String requesterEmail = user == null ? null : user.getUsername();
+        return shortUrlService.resolveAndRecordClick(shortCode, requesterEmail)
                 .map(this::redirectTo)
                 .orElseGet(this::notFound);
     }

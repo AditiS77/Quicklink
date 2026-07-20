@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -20,6 +20,11 @@
                 <p class="text-muted">
                     Shorten long URLs into clean, shareable links
                 </p>
+                <p>
+                    <a th:href="@{/login}">Log in</a>
+                    <span>or</span>
+                    <a th:href="@{/register}">create an account</a>
+                </p>
             </div>
 
             <div class="card shadow-sm">
@@ -28,7 +33,7 @@
 
                     <h4 class="mb-3">Create Short URL</h4>
 
-                    <form action="/shorten" method="post">
+                    <form th:action="@{/shorten}" method="post">
 
                         <div class="mb-3">
                             <label for="originalUrl" class="form-label">
@@ -41,6 +46,26 @@
                                     id="originalUrl"
                                     name="originalUrl"
                                     placeholder="https://example.com/very/long/url">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="expiresAt" class="form-label">
+                                Expiration date and time (optional, UTC)
+                            </label>
+
+                            <input
+                                    type="datetime-local"
+                                    class="form-control"
+                                    id="expiresAt"
+                                    name="expiresAt">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="visibility" class="form-label">Visibility</label>
+                            <select class="form-select" id="visibility" name="visibility">
+                                <option value="PUBLIC">Public</option>
+                                <option value="PRIVATE">Private</option>
+                            </select>
                         </div>
                     
                         <button

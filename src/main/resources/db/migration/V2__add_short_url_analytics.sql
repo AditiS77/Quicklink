@@ -1,0 +1,3 @@
+ALTER TABLE short_urls
+    ADD COLUMN click_count BIGINT NOT NULL DEFAULT 0,
+    ADD COLUMN expires_at TIMESTAMP WITH TIME ZONE;

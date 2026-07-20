@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My URLs | QuickLink</title>
+</head>
+<body>
+<main>
+    <h1>My URLs</h1>
+    <p><a th:href="@{/}">Create a short URL</a></p>
+
+    <p th:if="${#lists.isEmpty(shortUrls)}">You have not created any short URLs yet.</p>
+
+    <table th:unless="${#lists.isEmpty(shortUrls)}">
+        <thead>
+        <tr>
+            <th>Short URL</th>
+            <th>Destination</th>
+            <th>Clicks</th>
+            <th>Expires</th>
+            <th>Visibility</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="shortUrl : ${shortUrls}">
+            <td><a th:href="@{/{code}(code=${shortUrl.shortCode})}" th:text="${shortUrl.shortCode}"></a></td>
+            <td th:text="${shortUrl.originalUrl}"></td>
+            <td th:text="${shortUrl.clickCount}"></td>
+            <td th:text="${shortUrl.expiresAt == null ? 'Never' : shortUrl.expiresAt}"></td>
+            <td th:text="${shortUrl.visibility}"></td>
+        </tr>
+        </tbody>
+    </table>
+</main>
+</body>
+</html>

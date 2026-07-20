@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log In | QuickLink</title>
+</head>
+<body>
+<main>
+    <h1>Log In</h1>
+    <p th:if="${param.error}">Invalid email or password.</p>
+    <p th:if="${param.registered}">Your account has been created. Please log in.</p>
+    <form th:action="@{/login}" method="post">
+        <label for="username">Email</label>
+        <input id="username" name="username" type="email" required autofocus>
+
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" required>
+
+        <button type="submit">Log in</button>
+    </form>
+    <p><a th:href="@{/register}">Create an account</a></p>
+</main>
+</body>
+</html>
